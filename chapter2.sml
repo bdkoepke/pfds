@@ -1,3 +1,3 @@
 (* Exercise 2.1 *)
-fun suffixes nil = nil
+fun suffixes [] = [[]]
 	| suffixes (x::xs) = (x::xs)::(suffixes xs)
