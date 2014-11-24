@@ -58,6 +58,17 @@ sig
   val leq : T * T -> bool
 end
 
+structure OrderedInt: ORDERED =
+struct
+	type T = int
+
+	fun eq (x, y) = (x = y)
+
+	fun lt (x, y) = x < y
+
+	fun leq (x, y) = x <= y
+end
+
 functor UnbalancedSet (Element: ORDERED): SET =
 struct
   type Elem = Element.T
@@ -71,6 +82,32 @@ struct
       if Element.lt (x, y) then member (x, a)
       else if Element.lt (y, x) then member (x, b)
       else true
+
+  fun insert (x, E) = T (E, x, E)
+    | insert (x, s as T (a, y, b)) =
+      if Element.lt (x, y) then T (insert (x, a), y, b)
+      else if Element.lt (y, x) then T (a, y, insert (x, b))
+      else s
+end
+
+functor AnderssonSet (Element: ORDERED): SET =
+struct
+  type Elem = Element.T
+  datatype Tree = E | T of Tree * Elem * Tree
+  type Set = Tree
+
+  val empty = E
+
+  fun member (x, t) = let
+		fun member' (x, e, E) = Element.eq (x, e)
+    	| member' (x, e, T(a, y, b)) =
+      	if Element.lt (x, y) then member' (x, y, a)
+      	else member' (x, e, b)
+		in
+			case t of
+				E => false
+			| T(a, y, b) => member' (x, y, t)
+		end
 
   fun insert (x, E) = T (E, x, E)
     | insert (x, s as T (a, y, b)) =
