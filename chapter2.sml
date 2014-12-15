@@ -90,6 +90,7 @@ struct
       else s
 end
 
+(* Fix from: http://www.mlton.org/ObjectOrientedProgramming *)
 functor AnderssonSet (Element: ORDERED): SET =
 struct
   type Elem = Element.T
